@@ -1,0 +1,18 @@
+{
+  "name": "noflo-amd",
+  "main": "index.js",
+  "version": "0.1.0",
+  "authors": [
+    "Henri Bergius <henri.bergius@iki.fi>"
+  ],
+  "description": "Asynchronous Module Definition loader for NoFlo",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
