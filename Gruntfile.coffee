@@ -3,12 +3,16 @@ module.exports = ->
   @initConfig
     pkg: @file.readJSON 'package.json'
 
+    bower:
+      install:
+        options:
+          copy: false
+
     # Updating the package manifest files
     noflo_manifest:
       update:
         files:
           'component.json': ['graphs/*', 'components/*']
-          'package.json': ['graphs/*', 'components/*']
 
     # CoffeeScript compilation of tests
     coffee:
@@ -62,6 +66,7 @@ module.exports = ->
           'level': 'warn'
 
   # Grunt plugins used for building
+  @loadNpmTasks 'grunt-bower-task'
   @loadNpmTasks 'grunt-contrib-coffee'
   @loadNpmTasks 'grunt-noflo-manifest'
   @loadNpmTasks 'grunt-noflo-browser'
@@ -69,26 +74,22 @@ module.exports = ->
 
   # Grunt plugins used for testing
   @loadNpmTasks 'grunt-contrib-watch'
-  @loadNpmTasks 'grunt-cafe-mocha'
   @loadNpmTasks 'grunt-mocha-phantomjs'
   @loadNpmTasks 'grunt-coffeelint'
 
   # Our local tasks
   @registerTask 'build', 'Build NoFlo for the chosen target platform', (target = 'all') =>
-    @task.run 'coffee'
+    @task.run 'bower:install'
     @task.run 'noflo_manifest'
-    if target is 'all' or target is 'browser'
-      @task.run 'noflo_browser'
-      @task.run 'uglify'
+    @task.run 'noflo_browser'
+    @task.run 'uglify'
 
   @registerTask 'test', 'Build NoFlo and run automated tests', (target = 'all') =>
+    @task.run 'bower:install'
     @task.run 'coffeelint'
     @task.run 'coffee'
     @task.run 'noflo_manifest'
-    if target is 'all' or target is 'nodejs'
-      @task.run 'cafemocha'
-    if target is 'all' or target is 'browser'
-      @task.run 'noflo_browser'
-      @task.run 'mocha_phantomjs'
+    @task.run 'noflo_browser'
+    @task.run 'mocha_phantomjs'
 
   @registerTask 'default', ['test']

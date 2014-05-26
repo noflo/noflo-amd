@@ -1,5 +1,6 @@
 /node_modules/
 /browser/
+/bower_components/
 /components/*/
 /spec/*.js
 /spec/*.xml
