@@ -42,3 +42,14 @@ describe 'Require component', ->
         chai.expect(error.requireModules[0]).to.equal 'fixtures/foo.js'
         done()
       path.send 'fixtures/foo.js'
+
+  describe 'loading a module that requires another module', ->
+    it 'should return the module as expected', (done) ->
+      @timeout 20000
+      module.on 'data', (module) ->
+        chai.expect(module).to.be.a 'function'
+        chai.expect(module('Foo')).to.equal 'Hello Foo'
+        done()
+      setTimeout ->
+        path.send 'fixtures/world.js'
+      , 1000
