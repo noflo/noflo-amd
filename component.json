@@ -10,13 +10,15 @@
   },
   "scripts": [
     "index.js",
-    "components/Require.coffee"
+    "components/Require.coffee",
+    "components/Configure.coffee"
   ],
   "json": [
     "component.json"
   ],
   "noflo": {
     "components": {
+      "Configure": "components/Configure.coffee",
       "Require": "components/Require.coffee"
     }
   }
