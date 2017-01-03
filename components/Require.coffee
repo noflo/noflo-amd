@@ -2,40 +2,31 @@ noflo = require 'noflo'
 
 # @runtime noflo-browser
 
-class RequireModule extends noflo.AsyncComponent
-  icon: 'dot-circle-o'
-  description: 'Load an AMD module'
+exports.getComponent = ->
+  c = new noflo.Component
+  c.icon = 'dot-circle-o'
+  c.description = 'Load an AMD module'
 
-  constructor: ->
-    @inPorts = new noflo.InPorts
-      path:
-        datatype: 'string'
-        description: 'Path of the module to load'
-    @outPorts = new noflo.OutPorts
-      module:
-        datatype: 'object'
-      error:
-        datatype: 'object'
-        required: false
+  c.inPorts.add 'path',
+    datatype: 'string'
+    description: 'Path of the module to load'
+  c.outPorts.add 'module',
+    datatype: 'object'
+  c.outPorts.add 'error',
+    datatype: 'object'
+    required: false
 
-    super 'path', 'module'
-
-  doRequire: (path, callback) ->
-    window.requirejs [path], (module) =>
-      @outPorts.module.beginGroup path
-      @outPorts.module.send module
-      @outPorts.module.endGroup path
+  noflo.helpers.WirePattern c,
+    in: 'path'
+    out: 'module'
+    forwardGroups: true
+    async: true
+  , (path, groups, out, callback) ->
+    return callback new Error 'Require.js not available' unless window.requirejs
+    window.requirejs [path], (module) ->
+      out.beginGroup path
+      out.send module
+      out.endGroup path
       do callback
     , (err) ->
       callback err
-  doAsync: (path, callback) ->
-    return callback new Error 'Require.js not available' unless window.requirejs
-    try
-      @doRequire path, callback
-    catch err
-      try
-        @doRequire path, callback
-      catch e
-        callback err
-
-exports.getComponent = -> new RequireModule

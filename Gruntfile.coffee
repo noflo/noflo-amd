@@ -3,11 +3,6 @@ module.exports = ->
   @initConfig
     pkg: @file.readJSON 'package.json'
 
-    bower:
-      install:
-        options:
-          copy: false
-
     # Updating the package manifest files
     noflo_manifest:
       update:
@@ -44,18 +39,12 @@ module.exports = ->
       files: ['spec/*.coffee', 'components/*.coffee']
       tasks: ['test']
 
-    # BDD tests on Node.js
-    cafemocha:
-      nodejs:
-        src: ['spec/*.coffee']
-        options:
-          reporter: 'spec'
-
     # BDD tests on browser
     mocha_phantomjs:
       options:
         output: 'spec/result.xml'
         reporter: 'spec'
+        failWithOutput: true
       all: ['spec/runner.html']
 
     # Coding standards
@@ -66,7 +55,6 @@ module.exports = ->
           'level': 'warn'
 
   # Grunt plugins used for building
-  @loadNpmTasks 'grunt-bower-task'
   @loadNpmTasks 'grunt-contrib-coffee'
   @loadNpmTasks 'grunt-noflo-manifest'
   @loadNpmTasks 'grunt-noflo-browser'
@@ -79,7 +67,6 @@ module.exports = ->
 
   # Our local tasks
   @registerTask 'build', 'Build NoFlo for the chosen target platform', (target = 'all') =>
-    @task.run 'bower:install'
     @task.run 'noflo_manifest'
     @task.run 'noflo_browser'
     @task.run 'uglify'

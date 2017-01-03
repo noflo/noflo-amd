@@ -1,20 +1,29 @@
 noflo = require 'noflo'
 unless noflo.isBrowser()
-  chai = require 'chai' unless chai
-  RequireModule = require '../components/Require.coffee'
+  chai = require 'chai'
+  path = require 'path'
+  baseDir = path.resolve __dirname, '../'
 else
-  RequireModule = require 'noflo-amd/components/Require.js'
+  baseDir = 'noflo-amd'
 
 describe 'Require component', ->
   c = null
   path = null
   module = null
+  before (done) ->
+    @timeout 4000
+    loader = new noflo.ComponentLoader baseDir
+    loader.load 'amd/Require', (err, instance) ->
+      return done err if err
+      c = instance
+      path = noflo.internalSocket.createSocket()
+      c.inPorts.path.attach path
+      done()
   beforeEach ->
-    c = RequireModule.getComponent()
-    path = noflo.internalSocket.createSocket()
     module = noflo.internalSocket.createSocket()
-    c.inPorts.path.attach path
     c.outPorts.module.attach module
+  afterEach ->
+    c.outPorts.module.detach module
 
   describe 'when instantiated', ->
     it 'should have an path inport', ->
@@ -36,7 +45,7 @@ describe 'Require component', ->
       c.outPorts.error.attach err
 
       err.on 'data', (error) ->
-        chai.expect(error).to.be.an 'object'
+        chai.expect(error).to.be.an 'error'
         chai.expect(error.requireType).to.equal 'scripterror'
         chai.expect(error.requireModules).to.be.an 'array'
         chai.expect(error.requireModules[0]).to.equal 'fixtures/foo.js'

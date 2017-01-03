@@ -15,15 +15,16 @@ exports.getComponent = ->
   c.outPorts.add 'error',
     datatype: 'object'
     required: false
-  noflo.helpers.MapComponent c, (data, groups, out) ->
+
+  noflo.helpers.WirePattern c,
+    in: 'config'
+    out: 'ready'
+    forwardGroups: true
+    async: true
+  , (data, groups, out, callback) ->
     unless window.requirejs
-      c.outPorts.error.send new Error 'Require.js not available'
-      c.outPorts.error.disconnect()
+      return callback new Error 'Require.js not available'
       return
     window.requirejs.config data
     out.send true
-  ,
-    inPort: 'config'
-    outPort: 'ready'
-
-  c
+    callback()
